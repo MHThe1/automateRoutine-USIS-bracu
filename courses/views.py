@@ -12,6 +12,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+class CourseCodeSuggestionsAV(APIView):
+    def get(self, request):
+        query = request.GET.get('q', '')
+        if query:
+            course_sections = CourseSection.objects.filter(courseCode__icontains=query)
+            course_codes = course_sections.values_list('courseCode', flat=True).distinct()
+            return Response(course_codes)
+        return Response([])
+
 class GenerateRoutinesView(APIView):
     def post(self, request):
         data = request.data.get('courses', [])
