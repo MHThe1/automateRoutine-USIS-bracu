@@ -6,39 +6,54 @@ from courses.serializers import CourseSectionSerializer
 from collections import defaultdict
 from .utils import generate_routines
 
+
+from collections import defaultdict
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 class GenerateRoutinesView(APIView):
     def post(self, request):
-        data = request.data
+        data = request.data.get('courses', [])
         page = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('page_size', 10))
+        min_days = int(request.query_params.get('min_days', 1))  # Default to 1 day if not specified
 
-        sections = CourseSection.objects.filter(courseCode__in=data)
         sections_data = defaultdict(list)
-        for section in sections:
-            sections_data[section.courseCode].append({
-                'id': section.id,
-                'academicSectionId': section.academicSectionId,
-                'courseId': section.courseId,
-                'academicSessionId': section.academicSessionId,
-                'courseCode': section.courseCode,
-                'courseTitle': section.courseTitle,
-                'courseDetails': section.courseDetails,
-                'empName': section.empName,
-                'empShortName': section.empShortName,
-                'deptName': section.deptName,
-                'classSchedule': section.classSchedule,
-                'classLabSchedule': section.classLabSchedule,
-                'preRequisiteCourses': section.preRequisiteCourses,
-                'defaultSeatCapacity': section.defaultSeatCapacity,
-                'availableSeat': section.availableSeat,
-                'totalFillupSeat': section.totalFillupSeat,
-                'courseCredit': section.courseCredit,
-                'dayNo': section.dayNo,
-            })
+        for entry in data:
+            course_code = entry.get("courseCode")
+            section = entry.get("section")
+
+            if section:
+                sections = CourseSection.objects.filter(courseDetails=section)
+            else:
+                sections = CourseSection.objects.filter(courseCode=course_code)
+
+            for section in sections:
+                sections_data[section.courseCode].append({
+                    'id': section.id,
+                    'academicSectionId': section.academicSectionId,
+                    'courseId': section.courseId,
+                    'academicSessionId': section.academicSessionId,
+                    'courseCode': section.courseCode,
+                    'courseTitle': section.courseTitle,
+                    'courseDetails': section.courseDetails,
+                    'empName': section.empName,
+                    'empShortName': section.empShortName,
+                    'deptName': section.deptName,
+                    'classSchedule': section.classSchedule,
+                    'classLabSchedule': section.classLabSchedule,
+                    'preRequisiteCourses': section.preRequisiteCourses,
+                    'defaultSeatCapacity': section.defaultSeatCapacity,
+                    'availableSeat': section.availableSeat,
+                    'totalFillupSeat': section.totalFillupSeat,
+                    'courseCredit': section.courseCredit,
+                    'dayNo': section.dayNo,
+                })
 
         sections_data_list = list(sections_data.values())
-        routines_data = generate_routines(sections_data_list, page, page_size)
-        
+        routines_data = generate_routines(sections_data_list, page, page_size, min_days)
+
         return Response(routines_data, status=status.HTTP_200_OK)
 
 
@@ -160,3 +175,16 @@ class RoutineCheckView(APIView):
         
         find_combinations(0, [])
         return routines
+    
+    
+class CourseSectionsView(APIView):
+    def get(self, request, course_code):
+        sections = CourseSection.objects.filter(courseCode=course_code)
+        sections_data = [
+            {
+                'id': section.id,
+                'courseDetails': section.courseDetails
+            }
+            for section in sections
+        ]
+        return Response(sections_data, status=status.HTTP_200_OK)
