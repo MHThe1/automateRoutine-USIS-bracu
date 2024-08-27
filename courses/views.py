@@ -9,10 +9,10 @@ from .utils import generate_routines
 class GenerateRoutinesView(APIView):
     def post(self, request):
         data = request.data
-        
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
 
         sections = CourseSection.objects.filter(courseCode__in=data)
-        
         sections_data = defaultdict(list)
         for section in sections:
             sections_data[section.courseCode].append({
@@ -37,10 +37,10 @@ class GenerateRoutinesView(APIView):
             })
 
         sections_data_list = list(sections_data.values())
-
-        routines = generate_routines(sections_data_list)
+        routines_data = generate_routines(sections_data_list, page, page_size)
         
-        return Response(routines, status=status.HTTP_200_OK)
+        return Response(routines_data, status=status.HTTP_200_OK)
+
 
 
 class CourseSectionListView(APIView):

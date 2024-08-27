@@ -12,7 +12,8 @@ def calculate_total_duration(routine):
 
     # Collect all time slots from all courses in the routine
     for course in routine:
-        schedule = parse_schedule(course['classSchedule'])
+        # Parse classLabSchedule instead of classSchedule
+        schedule = parse_schedule(course['classLabSchedule'])
         for day, times in schedule.items():
             days_covered.add(day)
             if day not in daily_start_end_times:
@@ -39,8 +40,6 @@ def calculate_total_duration(routine):
 
 
 
-
-
 # Helper function to check if two time slots overlap
 def times_overlap(slot1, slot2):
     start1, end1 = parse_time(slot1[0]), parse_time(slot1[1])
@@ -57,7 +56,7 @@ def has_time_conflict(schedule1, schedule2):
                         return True
     return False
 
-# Parse the class schedule into a dictionary
+# Parse the combined classLabSchedule into a dictionary
 def parse_schedule(schedule_str):
     schedule = {}
     for entry in schedule_str.split(','):
@@ -66,17 +65,18 @@ def parse_schedule(schedule_str):
         time_parts = times.split('-')
         start_time = time_parts[0].strip()
         end_time = time_parts[1].strip()
+        
         # Adding the parsed time slots to the schedule
         if day not in schedule:
             schedule[day] = []
         schedule[day].append((start_time, end_time))
     
-    # print(f"parsed schedule: {schedule}")
     return schedule
 
 
+
 # Generate all possible routines without time conflicts
-def generate_routines(courses):
+def generate_routines(courses, page=1, page_size=10):
     all_combinations = list(product(*courses))
     routines = []
     for combination in all_combinations:
@@ -84,8 +84,8 @@ def generate_routines(courses):
         for i in range(len(combination)):
             for j in range(i + 1, len(combination)):
                 if has_time_conflict(
-                    parse_schedule(combination[i]['classSchedule']),
-                    parse_schedule(combination[j]['classSchedule'])
+                    parse_schedule(combination[i]['classLabSchedule']),
+                    parse_schedule(combination[j]['classLabSchedule'])
                 ):
                     conflict = True
                     break
@@ -99,5 +99,13 @@ def generate_routines(courses):
                 'total_days': total_days
             })
     sorted_routines = sorted(routines, key=lambda x: (x['total_days'], x['total_duration']))
-    return sorted_routines
-
+    
+    # Implement pagination
+    start_index = (page - 1) * page_size
+    end_index = start_index + page_size
+    paginated_routines = sorted_routines[start_index:end_index]
+    
+    return {
+        'routines': paginated_routines,
+        'total_count': len(sorted_routines)
+    }
