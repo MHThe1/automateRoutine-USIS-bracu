@@ -29,6 +29,7 @@ class GenerateRoutinesView(APIView):
         min_days = int(request.query_params.get('min_days', 2))
         max_days = int(request.query_params.get('max_days', 6))
         avoid_time = request.data.get('avoid_time', [])
+        avoid_day = request.data.get('avoid_day', [])
         course_count = len(data)
 
         print(f"avoid_time: {avoid_time}")
@@ -47,6 +48,9 @@ class GenerateRoutinesView(APIView):
                 for time_period in avoid_time:
                     # print(f"time_period: {time_period}")
                     sections = sections.exclude(classLabSchedule__contains=time_period)
+            if avoid_day:
+                for day in avoid_day:
+                    sections = sections.exclude(classLabSchedule__contains=day)
 
             for section in sections:
                 sections_data[section.courseCode].append({
