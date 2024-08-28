@@ -29,6 +29,7 @@ class GenerateRoutinesView(APIView):
         min_days = int(request.query_params.get('min_days', 2))
         max_days = int(request.query_params.get('max_days', 6))
         avoid_time = request.data.get('avoid_time', [])
+        course_count = len(data)
 
         print(f"avoid_time: {avoid_time}")
 
@@ -44,7 +45,7 @@ class GenerateRoutinesView(APIView):
 
             if avoid_time:
                 for time_period in avoid_time:
-                    print(f"time_period: {time_period}")
+                    # print(f"time_period: {time_period}")
                     sections = sections.exclude(classLabSchedule__contains=time_period)
 
             for section in sections:
@@ -70,7 +71,7 @@ class GenerateRoutinesView(APIView):
                 })
 
         sections_data_list = list(sections_data.values())
-        routines_data = generate_routines(sections_data_list, page, page_size, min_days, max_days)
+        routines_data = generate_routines(sections_data_list, course_count, page, page_size, min_days, max_days)
 
         return Response(routines_data, status=status.HTTP_200_OK)
 
