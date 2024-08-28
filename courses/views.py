@@ -27,6 +27,8 @@ class GenerateRoutinesView(APIView):
         page = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('page_size', 10))
         min_days = int(request.query_params.get('min_days', 1))  # Default to 1 day if not specified
+        avoid_time = str(request.query_params.get('avoid_time', ''))
+        print(f"avoid_time: {avoid_time}")
 
         sections_data = defaultdict(list)
         for entry in data:
@@ -37,6 +39,9 @@ class GenerateRoutinesView(APIView):
                 sections = CourseSection.objects.filter(courseDetails=section)
             else:
                 sections = CourseSection.objects.filter(courseCode=course_code)
+            
+            if avoid_time:
+                sections = sections.exclude(classLabSchedule__contains=avoid_time)
 
             for section in sections:
                 sections_data[section.courseCode].append({
