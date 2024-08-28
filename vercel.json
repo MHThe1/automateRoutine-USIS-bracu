@@ -4,13 +4,13 @@
       {
         "src": "autoroutine/wsgi.py",
         "use": "@vercel/python",
-        "config": { "runtime": "python3.9" }
+        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
       },
       {
         "src": "build_files.sh",
         "use": "@vercel/static-build",
         "config": {
-          "distDir": "ui/staticfiles"
+          "distDir": "staticfiles"
         }
       }
     ],
@@ -21,9 +21,7 @@
       },
       {
         "src": "/(.*)",
-        "dest": "autoroutine/wsgi.py"
+        "dest": "autoroutine/static/$1"
       }
-    ],
-    "outputDirectory": "ui/staticfiles"
+    ]
   }
-  
