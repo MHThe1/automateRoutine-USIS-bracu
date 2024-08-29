@@ -42,24 +42,37 @@ This project is a Django-based REST API designed to handle course scheduling for
     ```bash
     pip install -r requirements.txt
     ```
+    
+4. **Set up environment variables**
 
-4. **Configure the database**
+    Create a `.env` file in the root directory of the project and add your environment-specific variables. For example:
+
+    ```env
+    DEBUG=True
+    SECRET_KEY=your-secret-key
+    DATABASE_URL=postgres://user:password@localhost:5432/yourdbname
+    ALLOWED_HOSTS=localhost,127.0.0.1
+    ```
+
+    Ensure you have `django-environ` in your `requirements.txt` to handle environment variables.
+
+5. **Configure the database**
 
     Update the `DATABASES` setting in `settings.py` with your database configuration.
 
-5. **Apply database migrations**
+6. **Apply database migrations**
 
     ```bash
     python manage.py migrate
     ```
 
-6. **Create a superuser**
+7. **Create a superuser**
 
     ```bash
     python manage.py createsuperuser
     ```
 
-7. **Run the development server**
+8. **Run the development server**
 
     ```bash
     python manage.py runserver
