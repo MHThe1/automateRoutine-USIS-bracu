@@ -22,3 +22,18 @@ class CourseSection(models.Model):
 
     def __str__(self):
         return f"{self.courseCode} - {self.id}"
+
+
+class CourseCode(models.Model):
+    courseCode = models.CharField(max_length=10, unique=True)
+
+    def __str__(self):
+        return self.courseCode
+
+
+class CourseSectionInfo(models.Model):
+    courseCode = models.ForeignKey(CourseCode, related_name='sections', on_delete=models.CASCADE)
+    sectionInfo = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.courseCode.courseCode} - {self.sectionInfo}"

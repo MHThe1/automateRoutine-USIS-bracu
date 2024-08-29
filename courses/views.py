@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from courses.models import CourseSection
+from courses.models import CourseSection, CourseCode, CourseSectionInfo
 from courses.serializers import CourseSectionSerializer
 from collections import defaultdict
 from .utils import generate_routines
@@ -19,10 +19,22 @@ class CourseCodeSuggestionsAV(APIView):
     def get(self, request):
         query = request.GET.get('q', '')
         if query:
-            course_sections = CourseSection.objects.filter(courseCode__icontains=query)
-            course_codes = course_sections.values_list('courseCode', flat=True).distinct()
+            course_codes = CourseCode.objects.filter(courseCode__icontains=query).values_list('courseCode', flat=True)
             return Response(course_codes)
         return Response([])
+
+class CourseSectionsView(APIView):
+    def get(self, request, course_code):
+        sections = CourseSectionInfo.objects.filter(courseCode__courseCode=course_code)
+        sections_data = [
+            {
+                'id': section.id,
+                'courseDetails': section.sectionInfo
+            }
+            for section in sections
+        ]
+        return Response(sections_data, status=status.HTTP_200_OK)
+
 
 class GenerateRoutinesView(APIView):
     def post(self, request):
@@ -205,14 +217,3 @@ class RoutineCheckView(APIView):
         return routines
     
     
-class CourseSectionsView(APIView):
-    def get(self, request, course_code):
-        sections = CourseSection.objects.filter(courseCode=course_code)
-        sections_data = [
-            {
-                'id': section.id,
-                'courseDetails': section.courseDetails
-            }
-            for section in sections
-        ]
-        return Response(sections_data, status=status.HTTP_200_OK)
