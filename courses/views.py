@@ -39,8 +39,6 @@ class CourseSectionsView(APIView):
 class GenerateRoutinesView(APIView):
     def post(self, request):
         data = request.data.get('courses', [])
-        page = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('page_size', 10))
         min_days = int(request.query_params.get('min_days', 2))
         max_days = int(request.query_params.get('max_days', 6))
         avoid_time = request.data.get('avoid_time', [])
@@ -48,6 +46,8 @@ class GenerateRoutinesView(APIView):
         course_count = len(data)
 
         print(f"avoid_time: {avoid_time}")
+        print(f"min_days: {min_days}")
+        print(f"max_days: {max_days}")
 
         sections_data = defaultdict(list)
         for entry in data:
@@ -90,7 +90,7 @@ class GenerateRoutinesView(APIView):
                 })
 
         sections_data_list = list(sections_data.values())
-        routines_data = generate_routines(sections_data_list, course_count, page, page_size, min_days, max_days)
+        routines_data = generate_routines(sections_data_list, course_count, min_days, max_days)
 
         return Response(routines_data, status=status.HTTP_200_OK)
 

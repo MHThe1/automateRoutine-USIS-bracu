@@ -76,7 +76,7 @@ def parse_schedule(schedule_str):
 
 
 # Generate all possible routines without time conflicts
-def generate_routines(courses, course_count, page=1, page_size=10, min_days=None, max_days=7):
+def generate_routines(courses, course_count, min_days=None, max_days=7):
     all_combinations = list(product(*courses))
     routines = []
     for combination in all_combinations:
@@ -103,12 +103,8 @@ def generate_routines(courses, course_count, page=1, page_size=10, min_days=None
                 })
     sorted_routines = sorted(routines, key=lambda x: (x['total_days'], x['total_duration']))
 
-    # Implement pagination
-    start_index = (page - 1) * page_size
-    end_index = start_index + page_size
-    paginated_routines = sorted_routines[start_index:end_index]
 
     return {
-        'routines': paginated_routines,
+        'routines': sorted_routines,
         'total_count': len(sorted_routines)
     }
