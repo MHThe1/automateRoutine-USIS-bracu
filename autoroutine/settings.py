@@ -144,6 +144,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
+    'https://automate-routine.vercel.app/',
     'http://localhost:5173',
     'http://192.168.0.155:5173',
     'http://192.168.0.155:5174',
