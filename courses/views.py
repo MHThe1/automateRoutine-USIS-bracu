@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
 from courses.models import CourseSection
 from courses.serializers import CourseSectionSerializer
 from collections import defaultdict
@@ -11,6 +12,8 @@ from collections import defaultdict
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from courses.permissions import IsAdminOrReadOnly
 
 class CourseCodeSuggestionsAV(APIView):
     def get(self, request):
@@ -81,7 +84,10 @@ class GenerateRoutinesView(APIView):
 
 
 class CourseSectionListView(APIView):
-    def get(self, request):
+    
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def get(self, request):        
         course_code = request.query_params.get('courseCode')
         
         if course_code:
@@ -92,7 +98,7 @@ class CourseSectionListView(APIView):
         serializer = CourseSectionSerializer(courses, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    def post(self, request):        
         data = request.data
         if not isinstance(data, list):
             data = [data]
