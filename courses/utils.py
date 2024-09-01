@@ -3,7 +3,6 @@ from datetime import datetime
 
 # Helper function to parse the schedule time
 def parse_time(time_str):
-    # print(datetime.strptime(time_str, '%I:%M %p'))
     return datetime.strptime(time_str, '%I:%M %p')
 
 def calculate_total_duration(routine):
@@ -12,7 +11,6 @@ def calculate_total_duration(routine):
 
     # Collect all time slots from all courses in the routine
     for course in routine:
-        # Parse classLabSchedule instead of classSchedule
         schedule = parse_schedule(course['classLabSchedule'])
         for day, times in schedule.items():
             days_covered.add(day)
@@ -37,8 +35,6 @@ def calculate_total_duration(routine):
             total_minutes += duration
 
     return total_minutes, len(days_covered)
-
-
 
 # Helper function to check if two time slots overlap
 def times_overlap(slot1, slot2):
@@ -73,8 +69,6 @@ def parse_schedule(schedule_str):
     
     return schedule
 
-
-
 # Generate all possible routines without time conflicts
 def generate_routines(courses, course_count, min_days=None, max_days=7):
     all_combinations = list(product(*courses))
@@ -93,17 +87,14 @@ def generate_routines(courses, course_count, min_days=None, max_days=7):
                 break
         if not conflict:
             total_duration, total_days = calculate_total_duration(combination)
-            # print(len(courses), len(combination))
-            # print(courses, combination)
-            if (min_days == None or total_days >= min_days) and (max_days is 7 or total_days <= max_days) and (course_count == len(combination)):
+            if (min_days is None or total_days >= min_days) and (max_days == 7 or total_days <= max_days) and (course_count == len(combination)):
                 routines.append({
                     'courses': combination,
                     'total_duration': total_duration,
                     'total_days': total_days
                 })
+
     sorted_routines = sorted(routines, key=lambda x: (x['total_days'], x['total_duration']))
-
-
     limited_routines = sorted_routines[:200]
 
     return {
