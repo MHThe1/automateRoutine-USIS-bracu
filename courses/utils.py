@@ -95,7 +95,7 @@ def generate_routines(courses, course_count, min_days=None, max_days=7):
             total_duration, total_days = calculate_total_duration(combination)
             # print(len(courses), len(combination))
             # print(courses, combination)
-            if (min_days is None or total_days >= min_days) and (max_days is 7 or total_days <= max_days) and (course_count == len(combination)):
+            if (min_days == None or total_days >= min_days) and (max_days is 7 or total_days <= max_days) and (course_count == len(combination)):
                 routines.append({
                     'courses': combination,
                     'total_duration': total_duration,
