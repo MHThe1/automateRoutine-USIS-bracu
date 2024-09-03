@@ -15,6 +15,12 @@ from rest_framework import status
 
 from courses.permissions import IsAdminOrReadOnly
 
+class AllCourseCodesView(APIView):
+    def get(self, request):
+        course_codes = CourseCode.objects.all().values_list('courseCode', flat=True)
+        return Response(course_codes, status=status.HTTP_200_OK)
+
+
 class CourseCodeSuggestionsAV(APIView):
     def get(self, request):
         query = request.GET.get('q', '')
