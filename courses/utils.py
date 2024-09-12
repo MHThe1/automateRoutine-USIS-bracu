@@ -95,9 +95,8 @@ def generate_routines(courses, course_count, min_days=None, max_days=7):
                 })
 
     sorted_routines = sorted(routines, key=lambda x: (x['total_days'], x['total_duration']))
-    limited_routines = sorted_routines[:200]
 
     return {
-        'routines': limited_routines,
-        'total_count': len(limited_routines)
+        'routines': sorted_routines,
+        'total_count': len(sorted_routines)
     }
