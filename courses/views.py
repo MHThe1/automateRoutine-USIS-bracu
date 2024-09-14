@@ -14,7 +14,14 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from courses.permissions import IsAdminOrReadOnly
+from courses.facluty_names import faculties
 
+
+class AllCourseFacultiesView(APIView):
+    def get(self, request):
+        output_faculties = faculties
+        return Response(output_faculties, status=status.HTTP_200_OK)
+    
 class AllCourseCodesView(APIView):
     def get(self, request):
         course_codes = CourseCode.objects.all().values_list('courseCode', flat=True)
@@ -52,20 +59,34 @@ class GenerateRoutinesView(APIView):
         avoid_day = request.data.get('avoid_day', [])
         course_count = len(data)
 
-        print(f"avoid_faculty: {avoid_faculty}")
-        print(f"avoid_time: {avoid_time}")
-        print(f"min_days: {min_days}")
-        print(f"max_days: {max_days}")
+        # print(f"avoid_faculty: {avoid_faculty}")
+        # print(f"avoid_time: {avoid_time}")
+        # print(f"min_days: {min_days}")
+        # print(f"max_days: {max_days}")
+        # print(f"course_details: {data}")
 
         sections_data = defaultdict(list)
         for entry in data:
             course_code = entry.get("courseCode")
-            section = entry.get("section")
+            sections = entry.get("sections", [])
+            faculties = entry.get("faculties", [])
+            # print(sections)
 
-            if section:
-                sections = CourseSection.objects.filter(courseDetails=section)
+            if sections:
+                final_sections = CourseSection.objects.none()  # Start with an empty queryset
+                for section in sections:
+                    filtered_section = CourseSection.objects.filter(courseDetails=section)
+                    final_sections = final_sections | filtered_section  # Accumulate sections using OR
+                sections = final_sections  # Use the combined queryset
             else:
                 sections = CourseSection.objects.filter(courseCode=course_code)
+                
+            if faculties:
+                final_faculties = CourseSection.objects.none()  # Start with an empty queryset for faculties
+                for faculty in faculties:
+                    filtered_faculty = sections.filter(empShortName=faculty)
+                    final_faculties = final_faculties | filtered_faculty  # Accumulate faculties using OR
+                sections = final_faculties
 
             if avoid_faculty:
                 for faculty in avoid_faculty:
