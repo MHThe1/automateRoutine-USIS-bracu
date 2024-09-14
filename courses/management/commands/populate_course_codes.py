@@ -1,20 +1,24 @@
 from django.core.management.base import BaseCommand
-from courses.models import CourseSection, CourseCode, CourseSectionInfo
+from courses.models import CourseSection
+import json
+import os
 
 class Command(BaseCommand):
-    help = 'Populates the CourseCode and CourseSectionInfo models with data from CourseSection'
+    help = 'Exports the course data to a Python file'
 
     def handle(self, *args, **kwargs):
-        # Get all unique course codes from CourseSection
         unique_course_codes = CourseSection.objects.values('courseCode').distinct()
 
+        data_to_store = {}
+
         for course in unique_course_codes:
-            course_code, created = CourseCode.objects.get_or_create(courseCode=course['courseCode'])
+            course_code = course['courseCode']
+            sections = CourseSection.objects.filter(courseCode=course_code).values('courseDetails').distinct()
 
-            # Get all sections for this course code
-            sections = CourseSection.objects.filter(courseCode=course_code.courseCode).values('courseDetails').distinct()
+            data_to_store[course_code] = [section['courseDetails'] for section in sections]
 
-            for section in sections:
-                CourseSectionInfo.objects.get_or_create(courseCode=course_code, sectionInfo=section['courseDetails'])
+        file_path = os.path.join('courses', 'course_data.py')
+        with open(file_path, 'w') as file:
+            file.write(f"course_data = {json.dumps(data_to_store, indent=4)}")
 
-        self.stdout.write(self.style.SUCCESS('Successfully populated CourseCode and CourseSectionInfo models'))
+        self.stdout.write(self.style.SUCCESS('Successfully exported course data to course_data.py'))

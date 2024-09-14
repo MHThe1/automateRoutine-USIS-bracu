@@ -14,7 +14,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from courses.permissions import IsAdminOrReadOnly
-from courses.facluty_names import faculties
+from courses.faculties_data import faculties
+from courses.course_data import course_data 
 
 
 class AllCourseFacultiesView(APIView):
@@ -24,25 +25,23 @@ class AllCourseFacultiesView(APIView):
     
 class AllCourseCodesView(APIView):
     def get(self, request):
-        course_codes = CourseCode.objects.all().values_list('courseCode', flat=True)
+        course_codes = list(course_data.keys())
         return Response(course_codes, status=status.HTTP_200_OK)
-
 
 class CourseCodeSuggestionsAV(APIView):
     def get(self, request):
         query = request.GET.get('q', '')
         if query:
-            course_codes = CourseCode.objects.filter(courseCode__icontains=query).values_list('courseCode', flat=True)
-            return Response(course_codes)
+            filtered_course_codes = [code for code in course_data if query.lower() in code.lower()]
+            return Response(filtered_course_codes)
         return Response([])
 
 class CourseSectionsView(APIView):
     def get(self, request, course_code):
-        sections = CourseSectionInfo.objects.filter(courseCode__courseCode=course_code)
+        sections = course_data.get(course_code, [])
         sections_data = [
             {
-                'id': section.id,
-                'courseDetails': section.sectionInfo
+                'courseDetails': section
             }
             for section in sections
         ]
