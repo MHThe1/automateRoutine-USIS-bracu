@@ -13,9 +13,10 @@ class Command(BaseCommand):
 
         for course in unique_course_codes:
             course_code = course['courseCode']
-            sections = CourseSection.objects.filter(courseCode=course_code).values('courseDetails').distinct()
+            sections = CourseSection.objects.filter(courseCode=course_code).values('courseDetails', 'empShortName').distinct()
 
-            data_to_store[course_code] = [section['courseDetails'] for section in sections]
+            data_to_store[course_code] = [f"{section['courseDetails']} {section['empShortName']}" for section in sections]
+
 
         file_path = os.path.join('courses', 'course_data.py')
         with open(file_path, 'w') as file:
