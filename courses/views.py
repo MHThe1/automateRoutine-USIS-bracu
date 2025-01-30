@@ -123,6 +123,8 @@ class GenerateRoutinesView(APIView):
 
         sections_data_list = list(sections_data.values())
         routines_data = generate_routines(sections_data_list, course_count, min_days, max_days)
+        
+        print(routines_data)
 
         return Response(routines_data, status=status.HTTP_200_OK)
 

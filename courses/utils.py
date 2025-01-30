@@ -55,7 +55,7 @@ def has_time_conflict(schedule1, schedule2):
 # Parse the combined classLabSchedule into a dictionary
 def parse_schedule(schedule_str):
     schedule = {}
-    for entry in schedule_str.split(','):
+    for entry in schedule_str.split('\n'):
         day, times = entry.split('(')
         times = times[:-1]  # Remove the trailing ')'
         time_parts = times.split('-')
