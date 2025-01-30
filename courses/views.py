@@ -97,7 +97,7 @@ class GenerateRoutinesView(APIView):
                     sections = sections.exclude(classLabSchedule__contains=time_period)
             if avoid_day:
                 for day in avoid_day:
-                    sections = sections.exclude(classLabSchedule__contains=day)
+                    sections = sections.exclude(classLabSchedule__contains=day.upper())
 
             for section in sections:
                 sections_data[section.courseCode].append({
