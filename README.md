@@ -4,7 +4,7 @@
 
 This project is a Django-based REST API designed to handle course scheduling for a web application. The API provides endpoints to manage course sections, filter routines, and generate optimized schedules based on user preferences. The backend is built using Django and Django REST Framework, and it supports functionality such as handling large datasets, filtering by course codes and sections, and avoiding specific time periods.
 
-Database data is collected from the <a href="https://usis-cdn.eniamza.com/usisdump.json" target="_blank">USIS CDN DUMP</a> website.
+Database data is collected from BRACU connect.
 
 ## Features
 
